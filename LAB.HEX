@@ -1,0 +1,150 @@
+;INCLUIR UN ARCHIVO DE CABECERA
+; Laboratorio 2 PRIMER CORTE
+; Estudiantes:
+;Paloma Alvarez Peniche
+;Laura daniela fandiño
+    
+    .global _main
+;;;;; Configuraciones para el contador 
+;dentro del main establecer la configuracion
+	 .data
+i:      .hword 0x8000       ;Crear variable i en la posicion 0x8000 
+j:      .hword 0x8002       ;Crear variable j en la posicion 0x8001  
+       
+
+.text			    ;Esto era para separar las variables del programa, y era lo que faltaba 
+      
+.equ	  valor,9
+
+_main:
+	MOV     #0X0080, W0    ; Vector que describe como se va a comportar el PORTB 
+	MOV     W0, TRISB      ; Declaracion de variables de entrada y salida 
+        MOV     #0X0000, W0
+        MOV     W0, PORTB
+	MOV	#valor, W8	    ;Pasar etiqueta valor a W0	
+	MOV	W8,i	    ;Pasar W0 a la variable i
+	MOV	i, W8
+	MOV	W8,j
+_bucle:
+        CALL    CERO
+	CALL    UNO
+	CALL    DOS
+	CALL    TRES
+	CALL    CUATRO
+	CALL    CINCO
+	CALL    SEIS
+	CALL    SIETE 
+	CALL    OCHO
+	CALL    NUEVE
+	GOTO    _bucle
+;; Delay 1s
+DELAY1S:
+        MOV    #1000,W0
+REPETIR:
+        DEC    W0, W1
+        MOV    W1, W0
+        BRA    Z, RETORNAR
+        REPEAT  #5000
+        NOP
+        GOTO   REPETIR
+RETORNAR:
+        RETURN
+;cero
+CERO:
+        MOV    #0X003F,W3
+	MOV    W3, LATB    
+        CALL   DELAY1S
+	
+	RETURN
+;UNO
+UNO:
+	MOV    #0X0006,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	RETURN
+;DOS	
+DOS:
+	MOV    #0X005B,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;TRES
+TRES:
+	MOV    #0X004F,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;CUATRO
+CUATRO:
+	MOV    #0X0066,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;CINCO
+CINCO:
+	MOV    #0X006D,W3
+	MOV    W3, LATB    
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;SEIS
+SEIS:
+	MOV    #0X007D,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;SIETE
+SIETE:
+	MOV    #0X0007,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;OCHO
+OCHO:
+	MOV    #0X007F,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+;NUEVE
+NUEVE:
+	MOV    #0X006F,W3
+	MOV    W3, LATB
+        CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	CALL   DELAY1S
+	RETURN
+.END
+ 
