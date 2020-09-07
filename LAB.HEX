@@ -8,11 +8,11 @@
 ;;;;; Configuraciones para el contador 
 ;dentro del main establecer la configuracion
 	 .data
-i:      .hword 0x8000       ;Crear variable i en la posicion 0x8000 
-j:      .hword 0x8002       ;Crear variable j en la posicion 0x8001  
+i:      .hword 0x8000         ;Crear variable i en la posicion 0x8000 
+j:      .hword 0x8002         ;Crear variable j en la posicion 0x8001  
        
 
-.text			    ;Esto era para separar las variables del programa, y era lo que faltaba 
+.text			       ;Esto era para separar las variables del programa, y era lo que faltaba 
       
 .equ	  valor,9
 
@@ -21,22 +21,80 @@ _main:
 	MOV     W0, TRISB      ; Declaracion de variables de entrada y salida 
         MOV     #0X0000, W0
         MOV     W0, PORTB
-	MOV	#valor, W8	    ;Pasar etiqueta valor a W0	
-	MOV	W8,i	    ;Pasar W0 a la variable i
+	MOV	#valor, W8     ;Pasar etiqueta valor a W0	
+	MOV	W8,i	       ;Pasar W0 a la variable i
 	MOV	i, W8
 	MOV	W8,j
+INICIO: 
+        MOV     #0X0000, W2    ; Registro que va a contar 
 _bucle:
-        CALL    CERO
-	CALL    UNO
-	CALL    DOS
-	CALL    TRES
-	CALL    CUATRO
-	CALL    CINCO
-	CALL    SEIS
-	CALL    SIETE 
-	CALL    OCHO
-	CALL    NUEVE
+        CALL    CONTEO         ;Realizo elconteo asendente o desendente 
+; Que numero voy a poner teniedo en cuenta el valor de j 
+NUMERO: MOV	j,W3  
+	CP0	W3 
+	BRA	Z,CERO
+	CP      W3,#0X01
+	BRA     Z,UNO
+	CP      W3,#0x02
+	BRA     Z,DOS
+	CP      W3,#0x03
+	BRA     Z,TRES
+	CP      W3,#0x04
+	BRA     Z,CUATRO
+	CP      W3,#0x05
+	BRA     Z, CINCO
+	CP      W3,#0x06
+	BRA     Z, SEIS
+	CP      W3,#0x07
+	BRA     Z, SIETE
+	CP      W3,#0x08
+	BRA     Z,OCHO
+	CP      W3,#0x09
+	BRA     Z,NUEVE
 	GOTO    _bucle
+;; evaluar el valor del boton
+evaluar_boton:
+	CALL   DELAY1S
+        MOV    PORTB, W4
+	MOV    #0X0080, W5
+	AND    W4,W5, W6
+	CP0    W6 
+	BRA    Z, RETORNO 
+	CP     W2,#0X1F
+	BRA    Z,REIN
+	MOV    W2, W12
+	INC    W12, W2
+	RETURN
+REIN:
+        MOV    #0X0000, W2
+	GOTO   RETORNO
+RETORNO:
+	RETURN
+
+; Evaluacion del conteo si es ascendente o decendente que valor voy a tomar?
+CONTEO: 
+        MOV   #0X0001, W7
+        AND   W2, W7, W6
+        CP0   W6            ; Evaluo si el ultimo bit es 1 o 0
+        BRA   Z, ASCENDENTE ; si el ultimo bit es cero elconteo es ascendente 
+        CP0   j             ; si esta en decremento y llega cero se reinicia en 9
+        BRA   Z, REINICIO
+        DEC   j             ; si no es 0 se decrementa el valor de j
+	RETURN
+REINICIO:
+        MOV   W8,j          ; asignar 9
+	GOTO  NUMERO
+ASCENDENTE:
+        MOV   j, W11
+        CP    W11, #0X09     ; si esta incrementando y llega a 9 le asigno 0
+	BRA   Z, REINICIO_A
+	INC   j             ; si no es 9 leincremento  1
+	GOTO  NUMERO
+REINICIO_A:
+        MOV   #0X0000, W10 
+        MOV   W10,j         ;asiganar 0
+	GOTO  NUMERO
+    
 ;; Delay 1s
 DELAY1S:
         MOV    #1000,W0
@@ -49,102 +107,100 @@ REPETIR:
         GOTO   REPETIR
 RETORNAR:
         RETURN
-;cero
+;CERO
 CERO:
         MOV    #0X003F,W3
 	MOV    W3, LATB    
-        CALL   DELAY1S
-	
-	RETURN
+        CALL   evaluar_boton
+	GOTO   _bucle
 ;UNO
 UNO:
 	MOV    #0X0006,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	GOTO   _bucle
 ;DOS	
 DOS:
 	MOV    #0X005B,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;TRES
 TRES:
 	MOV    #0X004F,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;CUATRO
 CUATRO:
 	MOV    #0X0066,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;CINCO
 CINCO:
 	MOV    #0X006D,W3
 	MOV    W3, LATB    
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;SEIS
 SEIS:
 	MOV    #0X007D,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;SIETE
 SIETE:
 	MOV    #0X0007,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;OCHO
 OCHO:
 	MOV    #0X007F,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 ;NUEVE
 NUEVE:
 	MOV    #0X006F,W3
 	MOV    W3, LATB
-        CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	CALL   DELAY1S
-	RETURN
+        CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	CALL   evaluar_boton
+	GOTO   _bucle
 .END
- 
